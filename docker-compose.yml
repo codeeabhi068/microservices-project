@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  discovery-server:
+    image: discovery-server
+    build:
+      context: ./discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-network
+
+  api-gateway:
+    image: api-gateway
+    build:
+      context: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+    networks:
+      - microservices-network
+
+  user-service:
+    image: user-service
+    build:
+      context: ./user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - discovery-server
+    networks:
+      - microservices-network
+
+  order-service:
+    image: order-service
+    build:
+      context: ./order-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - discovery-server
+      - order-db
+    networks:
+      - microservices-network
+
+  product-service:
+    image: product-service
+    build:
+      context: ./product-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - discovery-server
+      - product-db
+    networks:
+      - microservices-network
+
+  order-db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orderdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - order-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  product-db:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - product-data:/data/db
+    networks:
+      - microservices-network
+
+volumes:
+  order-data:
+  product-data:
+
+networks:
+  microservices-network:
+    driver: bridge

@@ -1,0 +1,16 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: product-service
+  data:
+    mongodb:
+      host: product-db
+      port: 27017
+      database: productdb
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
